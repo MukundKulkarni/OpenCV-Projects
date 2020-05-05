@@ -58,4 +58,29 @@ blurred = np.hstack([
 
 cv2.imshow("Blurred3", blurred)
 
+
+"""
+In order to reduce noise while still maintaining edges, we
+can use bilateral blurring.
+
+The first Gaussian function only considers spatial neigh-
+bors, that is, pixels that appear close together in the ( x, y )
+coordinate space of the image. The second Gaussian then
+models the pixel intensity of the neighborhood, ensuring
+that only pixels with similar intensity are included in the
+actual computation of the blur.
+
+
+"""
+
+
+blurred = np.hstack([
+    cv2.bilateralFilter(image, 5, 21, 21),
+    cv2.bilateralFilter(image, 7, 31, 31),
+    cv2.bilateralFilter(image, 9, 41, 41),
+])
+
+cv2.imshow("Blurred4", blurred)
+
+
 cv2.waitKey(0)
