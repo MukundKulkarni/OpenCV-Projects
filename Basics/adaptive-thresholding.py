@@ -24,13 +24,13 @@ blurred = cv2.GaussianBlur(image, (5,5), 0)
 
 cv2.imshow("Orignal", blurred)
 
-(T, thresh) = cv2.threshold(blurred, 140, 255, cv2.THRESH_BINARY) # We manually supply the threshold value, every pixel have value greater than 140 is set to 255
+thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 11, 9)
+# (IMAGE, SET-PIXLE-COLOR, ADAPTIVE_THRESH_MEAN_C USING MEAN, BINARY THRESH, SIZE OF KERNEL, CONSTANT TO FINE TUNE OUR THRESHOLD )
+cv2.imshow("MEAN THRESH", thresh)
 
-cv2.imshow("Binary Thresholding", thresh)
-
-(T, thresh) = cv2.threshold(blurred, 140, 255, cv2.THRESH_BINARY_INV) # We manually supply the threshold value, every pixel have value greater than 140 is set to 0
-
-cv2.imshow("Inverse Binary Thresholding", thresh)
+thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 15, 9)
+# (IMAGE, SET-PIXLE-COLOR, ADAPTIVE_THRESH_GAUSSIAN_C USING GAUSSIAN MEAN, BINARY THRESH, SIZE OF KERNEL, CONSTANT TO FINE TUNE OUR THRESHOLD )
+cv2.imshow("GAUSSIAN THRESH", thresh)
 
 
 
