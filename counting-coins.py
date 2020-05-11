@@ -16,15 +16,17 @@ r = 400.0/image.shape[1]
 
 dim = (400, int(image.shape[0]*r))
 
-image = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
+image = cv2.resize(image, dim, interpolation = cv2.INTER_AREA) # resize image
 
-image = image[10:, 10:]
+#image = image[10:, 10:] # crop image if required
 
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 blurred = cv2.GaussianBlur(gray, (5,5), 0)
 
 cv2.imshow("Orignal", blurred)
+
+cv2.waitKey(0)
 
 canny = cv2.Canny(blurred,40, 150) # (Gradient1, Gradient2) using canny edge detection
 #Any Gradient value below Gradient1 is considered not edge and vice-versa
@@ -39,7 +41,9 @@ print("I count {} coins.".format(len(cnts)))
 
 coins = image.copy()
 
-cv2.drawContours(coins, cnts, -1, (0,0,255), 2)
+cv2.drawContours(coins, cnts, -1, (0,220,0), 2)
+
+cv2.putText(coins, "I count " +  str(len(cnts)) + " coins.", (50,50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, 255 )
 
 cv2.imshow("Coins", coins)
 
