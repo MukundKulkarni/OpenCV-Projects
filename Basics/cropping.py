@@ -11,7 +11,7 @@ args = vars(ap.parse_args())
 image = cv2.imread(args["image"])
 cv2.imshow("Orignal", image)
 
-cropped = image[50:200, 50:200]
+cropped = image[140:510, 0:400]
 cv2.imshow("Cropped", cropped)
 
 cv2.waitKey(0)
