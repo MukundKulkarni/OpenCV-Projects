@@ -3,8 +3,8 @@ import numpy as np
 import cv2
 import time
 
-whiteLower = (0,111,209)
-whiteUpper = (255,206,255)
+whiteLower = (29, 86, 6)
+whiteUpper = (64, 255, 255)
 pts = deque(maxlen=20)
 
 vs = cv2.VideoCapture(0)
@@ -22,7 +22,7 @@ while True:
     mask = cv2.dilate(mask, None, iterations=2)
 
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-    cnts = cnts[1]
+    cnts = cnts[0]
     center = None
 
     if len(cnts) > 0:
