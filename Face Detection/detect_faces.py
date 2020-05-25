@@ -6,6 +6,41 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required = True, help = "Path to imput image")
 ap.add_argument("-p", "--protxt", required = True, help = "Path to caffe \"deploy\" protxt file")
 ap.add_argument("-m", "--model", required = True, help = "Path to caffe pre-trained model")
-ap.add_argument("-c", "--confidence", required = True, type=float, default = 0.5, help = "Minimum probablity to filter weak detections")
+ap.add_argument("-c", "--confidence", required = False, type=float, default = 0.5, help = "Minimum probablity to filter weak detections")
 
 args = vars(ap.parse_args())
+
+
+# Read Model
+
+net = cv2.dnn.readNetFromCaffe(args["protxt"], args["model"])
+
+# load the input image and construct an input blob for the image
+# by resizing to a fixed 300x300 pixels and then normalizing it
+
+image = cv2.imread(args["image"])
+(h,w) = image.shape[:2]
+
+blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 1.0,(300, 300), (104.0, 177.0, 123.0))
+
+net.setInput(blob)
+
+detections = net.forward()
+
+for i in range(0,detections.shape[2]):
+
+    confidence = detections[0,0,i,2]
+
+    if confidence > args["confidence"]:
+        box = detections[0,0,i,3:7] * np.array([w,h,w,h])
+        (startX, startY, endX, endY) = box.astype(int)
+
+        text = "{:.2f}%".format(confidence * 100)
+        y = startY - 10 if startY - 10 > 10 else startY + 10
+        cv2.rectangle(image, (startX, startY), (endX, endY), (0, 0, 255), 2)
+
+        cv2.putText(image, text, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0,255,0), 2)
+
+cv2.imshow("Image", image)
+
+cv2.waitKey(0)
