@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import argparse as ap
 from matplotlib import  pyplot as plt
+from skimage.filters import threshold_local
 import mahotas
 
 pts = []
@@ -26,12 +27,11 @@ args = vars(ap.parse_args())
 
 image = cv2.imread(args["image"])
 
-r = 400.0/image.shape[1]
+r = 600.0/image.shape[1]
 
-dim = (400, int(image.shape[0]*r))
+dim = (600, int(image.shape[0]*r))
 
 image = cv2.resize(image,dim, interpolation = cv2.INTER_AREA)
-image = image[140:510, 0:400]
 cv2.imshow("Orignal", image)
 cv2.namedWindow('image')
 
@@ -44,13 +44,14 @@ while True:
 		break
 
 print(pts)
+pts1 =np.float32(pts)
 
 pts2 = np.float32([[0,0],[300,0],[300,300],[0,300]])
-pts1 =np.float32(pts)
 
 M = cv2.getPerspectiveTransform(pts1,pts2)
 
 dst = cv2.warpPerspective(image,M,(300,300))
+
 
 plt.subplot(121),plt.imshow(image),plt.title('Input')
 plt.subplot(122),plt.imshow(dst),plt.title('Output')
