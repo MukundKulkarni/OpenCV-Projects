@@ -46,15 +46,19 @@ while True:
 print(pts)
 pts1 =np.float32(pts)
 
-pts2 = np.float32([[0,0],[300,0],[300,300],[0,300]])
+width = max(pts1[1][0] - pts1[0][0], pts1[2][0] - pts1[3][0])
+height = max(pts1[3][1] - pts1[0][1], pts1[2][1] - pts1[1][1])
+
+pts2 = np.float32([[0,0],[width,0],[width,height],[0,height]])
 
 M = cv2.getPerspectiveTransform(pts1,pts2)
 
-dst = cv2.warpPerspective(image,M,(300,300))
+dst = cv2.warpPerspective(image,M,(width,height))
 
+warped = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
+T = threshold_local(warped, 11, offset = 10, method = "gaussian")
+warped = (warped > T).astype("uint8") * 255
 
-plt.subplot(121),plt.imshow(image),plt.title('Input')
-plt.subplot(122),plt.imshow(dst),plt.title('Output')
-plt.show()
-
+cv2.imshow("Original", image)
+cv2.imshow("Scanned", warped)
 cv2.waitKey(0)
