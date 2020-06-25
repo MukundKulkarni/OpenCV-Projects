@@ -2,4 +2,6 @@ venv/
 opencv-3.4.10/
 __pycache__/
 profile.jpeg
+vid1.mp4
+vid2.mp4
 shape_predictor_68_face_landmarks.dat.bz2
