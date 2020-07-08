@@ -37,7 +37,7 @@ while(True):
     finalOutput = cv2.addWeighted(res1, 1, res2, 1, 0)
 
 
-    cv2.imshow('flipped',finalOutputq)
+    cv2.imshow('flipped',finalOutput)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
