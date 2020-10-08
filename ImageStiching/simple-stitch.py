@@ -3,6 +3,7 @@ import argparse
 import  numpy as np
 from os import walk
 import glob
+import imutils
 
 def resize(image,y ):
     r = float(y)/image.shape[1] # Maintain the aspect ratio
@@ -31,6 +32,7 @@ images = []
 
 for filename in file_list:
     image = resize(cv2.imread(filename), 400)
+    #image = imutils.resize(cv2.imread(filename),width=400)   #IMUTILS PRESERVES THE ASPECT RATIO, YOU WON'T HAVE TO MAKE A SEPERATE FUNCTION FOR IT.
     cv2.imshow("IMG",image)
     cv2.waitKey(0)
     images.append(image)
