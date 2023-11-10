@@ -79,6 +79,8 @@ if __name__ == "__main__":
 
     # Add a text format.
     text_format = workbook1.add_format({'text_wrap': True})
+    # Add a text format.
+    text_format_1 = workbook1.add_format({'text_wrap': True, 'border' : 1})
     # Add a header format.
     header_format = workbook1.add_format({
         'bold': True,
@@ -129,12 +131,29 @@ if __name__ == "__main__":
 
     for column in columns:
         freq_df = proc_frequency(input_df, column)
-        freq_df.to_excel(report1, sheet_name=sheet_name, index=True, startcol = startcol, startrow = startrow, header=False)
+        for col_num, value in enumerate(freq_df.columns.values):
+            worksheet1.write(startrow - 1, col_num + 1, value, header_format)
+
         worksheet1.write(startrow - 1, 0, column, header_format)
         worksheet1.merge_range(startrow - 2, 0, startrow - 2, 4, column, table_title_format)
 
-        for col_num, value in enumerate(freq_df.columns.values):
-            worksheet1.write(startrow - 1, col_num + 1, value, header_format)
+        start_row = startrow
+
+        for index in freq_df.index.values.tolist():
+            worksheet1.write(start_row, 0, index, table_title_format)
+            start_row += 1
+
+        start_col = startcol
+        for col in freq_df.columns:
+
+            start_row = startrow
+            for value in freq_df[col]:
+                worksheet1.write(start_row, start_col + 1, value, text_format_1)
+                start_row += 1
+            start_col += 1
+
+
+
 
         startrow += freq_df.shape[0] + 3
 
