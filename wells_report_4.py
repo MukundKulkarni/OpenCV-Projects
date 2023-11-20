@@ -5,13 +5,41 @@ import random
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment, Border, Side, PatternFill, Font
 
+import math
+def format_RFM0_(attribute):
+
+    if math.isnan(attribute):
+        return "MISSING"
+    elif attribute <= 100 and attribute >= 0:
+        return "0-100"
+    elif attribute <= 200 and attribute >= 101:
+        return "101-200"
+    elif attribute <= 300 and attribute >= 201:
+        return "201-300"
+    elif attribute <= 400 and attribute >= 301:
+        return "301-400"
+    elif attribute <= 500 and attribute >= 401:
+        return "401-500"
+    elif attribute <= 600 and attribute >= 501:
+        return "501-600"
+    elif attribute <= 700 and attribute >= 601:
+        return "601-700"
+    elif attribute <= 800 and attribute >= 701:
+        return "701-800"
+    elif attribute <= 900 and attribute >= 801:
+        return "801-900"
+    else:
+        return ">901"
 
 def create_test_data_citizens_syn(size):
     values = {"SCORE_PSPS5206": [str(n).zfill(5) for n in range(88, 100)] + [" "],
               "NEW_CUSTOM_ATTR2": [" ", "94"],
               "FRAUD_VICTIM_FLAG": [" ", "N", "Q", "R", "T", "W", "X"],
               "NEW_CUSTOM_ATTR1": [" ", "A", "B", "1", "2", "3", "4"],
-              "ACCEPT_DROP_TAG": ["A", "P", "X", "Z"]
+              "ACCEPT_DROP_TAG": ["A", "P", "X", "Z"],
+              "CMA_3000" : [n for n in range(0, 10000)] + [" "],
+              "CMA_3001" : [n for n in range(0, 10000)] + [" "],
+              "CMA_3002" : [n for n in range(0, 10000)] + [" "]
               }
 
     df = pd.DataFrame()
@@ -211,6 +239,89 @@ def one_way_freq_to_excel(report, input_df, start_row, start_col, attribute1):
         startcol += 1
 
 
+def proc_means(input_df, attributes):
+
+    means_dict = {
+        "Variable" : [],
+        "N" : [],
+        "Mean" : [],
+        "Std Dev": [],
+        "Minimum": [],
+        "Maximum": []
+        }
+
+    for attribute in attributes:
+
+        filtered_df = pd.to_numeric(input_df[input_df[attribute].notnull()][attribute])
+
+        means_dict["Variable"].append(attribute)
+        means_dict["N"].append(filtered_df.count())
+        means_dict["Mean"].append(filtered_df.mean())
+        means_dict["Std Dev"].append(filtered_df.std())
+        means_dict["Minimum"].append(filtered_df.min())
+        means_dict["Maximum"].append(filtered_df.max())
+
+    means_df = pd.DataFrame(means_dict)
+
+    return means_df
+
+
+def proc_means_to_excel(input_df, start_row, start_col):
+
+    # Add a text format.
+    text_format_1 = workbook1.add_format({'text_wrap': True})
+    text_format_2 = workbook1.add_format({'text_wrap': True, 'left': 2})
+    text_format_3 = workbook1.add_format({'text_wrap': True, 'right': 2})
+
+    # Add a header format.
+    header_format = workbook1.add_format({
+        'bold': True,
+        'text_wrap': True,
+        'valign': 'top',
+        'align': 'center',
+        'fg_color': '#d6eaf8',
+        'border': 1})
+
+    # Add a header format.
+    cell_format = workbook1.add_format({'text_wrap': True})
+
+    # Add a header format.
+    table_title_format = workbook1.add_format({
+        'bold': True,
+        'text_wrap': True,
+        'align': 'center',
+        'fg_color': '#d6eaf8',
+        'border': 2})
+
+    title_format = workbook1.add_format({
+        'bold': True,
+        'align': 'left',
+        'fg_color': '#d6eaf8',
+        'border': 2})
+
+    startrow = start_row
+    startcol = start_col
+
+    for col_num, value in enumerate(input_df.columns.values):
+        worksheet1.write(startrow, startcol, value, header_format)
+        startcol += 1
+
+    startcol = start_col
+
+    for i, col in enumerate(input_df.columns):
+        startrow = start_row + 1
+        for value in input_df[col]:
+            if i == 0:
+                worksheet1.write(startrow, startcol, value, text_format_2)
+            elif i == len(input_df.columns) - 1:
+                worksheet1.write(startrow, startcol, value, text_format_3)
+            else:
+                worksheet1.write(startrow, startcol, value, text_format_1)
+            startrow += 1
+        startcol += 1
+
+
+
 if __name__ == "__main__":
     np.random.seed(42)
 
@@ -235,7 +346,7 @@ if __name__ == "__main__":
         'fg_color': '#d6eaf8',
         'border': 1})
 
-    input_df = test_df[["SCORE_PSPS5206", "NEW_CUSTOM_ATTR2", "FRAUD_VICTIM_FLAG", "NEW_CUSTOM_ATTR1", "ACCEPT_DROP_TAG"]]
+    input_df = test_df[["SCORE_PSPS5206", "NEW_CUSTOM_ATTR2", "FRAUD_VICTIM_FLAG", "NEW_CUSTOM_ATTR1", "ACCEPT_DROP_TAG", "CMA_3000", "CMA_3001", "CMA_3002"]]
 
     columns = input_df.columns
 
@@ -243,19 +354,23 @@ if __name__ == "__main__":
 
     # two_way_freq = proc_frequency(input_df, "SCORE_PSPS5206", "NEW_CUSTOM_ATTR2")
     # headers = input_df["NEW_CUSTOM_ATTR2"].unique()
-    # two_waf_freq_to_excel(report1, two_way_freq, 6, 0, "SCORE_PSPS5206", "NEW_CUSTOM_ATTR2", headers)
+    # two_way_freq_to_excel(report1, two_way_freq, 6, 0, "SCORE_PSPS5206", "NEW_CUSTOM_ATTR2", headers)
     #
     # two_way_freq = proc_frequency(input_df, "FRAUD_VICTIM_FLAG", "NEW_CUSTOM_ATTR1")
     # headers = input_df["NEW_CUSTOM_ATTR1"].unique()
-    # two_waf_freq_to_excel(report1, two_way_freq, 39, 0, "FRAUD_VICTIM_FLAG", "NEW_CUSTOM_ATTR1", headers)
+    # two_way_freq_to_excel(report1, two_way_freq, 39, 0, "FRAUD_VICTIM_FLAG", "NEW_CUSTOM_ATTR1", headers)
+    #
+    # one_way_freq = proc_frequency(input_df, "ACCEPT_DROP_TAG")
+    # print(one_way_freq)
+    # one_way_freq_to_excel(report1, one_way_freq, 70, 0, "ACCEPT_DROP_TAG")
+    #
+    # one_way_freq = proc_frequency(input_df, "FRAUD_VICTIM_FLAG")
+    # print(one_way_freq)
+    # one_way_freq_to_excel(report1, one_way_freq, 80, 0, "FRAUD_VICTIM_FLAG")
 
-    one_way_freq = proc_frequency(input_df, "ACCEPT_DROP_TAG")
-    print(one_way_freq)
-    one_way_freq_to_excel(report1, one_way_freq, 6, 0, "ACCEPT_DROP_TAG")
 
-    one_way_freq = proc_frequency(input_df, "FRAUD_VICTIM_FLAG")
-    print(one_way_freq)
-    one_way_freq_to_excel(report1, one_way_freq, 20, 0, "FRAUD_VICTIM_FLAG")
+    means_df = proc_means(input_df, ["CMA_3000", "CMA_3001", "CMA_3002"])
+    proc_means_to_excel(means_df, 6, 0)
 
     report1.close()
 
